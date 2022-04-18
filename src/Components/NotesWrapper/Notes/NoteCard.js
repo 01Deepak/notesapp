@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 
-const NoteCard = ({ val }) => {
+const NoteCard = ({ note, openNoteDetail }) => {
 
   return (
-    <>
-      <h5>{val.body}</h5>
-      <span style={{ backgroundColor: "green", color: "white" }}>{val.createdTime}</span>
+    <div onClick={() => openNoteDetail(note)}>
+      <h5>{note.body}</h5>
+      <span style={{ backgroundColor: "green", color: "white" }}>{note.createdTime}</span>
       <hr />
-    </>
+    </div>
   )
 }
 

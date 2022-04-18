@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 const AddNote = ({ flag, UpdateNotes, updatedNote, body, closeAddNote, addNote }) => {
-    const [text, setText] = useState(body)
+    const [text, setText] = useState(updatedNote && updatedNote.body)
 
     //handle input change
     const handleChange = (event) => {

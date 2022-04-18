@@ -3,11 +3,11 @@ import AddNote from './AddNote'
 
 const NoteDetails = ({ noteDetailsData, close, deleteNote, UpdateNotes, toggleEdit, isOpenEdit }) => {
     const [flag, setFlag] = useState(false)
-
+    
     // flag should be true and call toggleEdit
     const edit = () => {
-        toggleEdit()
         setFlag(true)
+        toggleEdit()
     }
 
     if (isOpenEdit) {

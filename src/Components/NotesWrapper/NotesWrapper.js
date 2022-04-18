@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import AddNote from '../AddNote'
+import { VIEW_CONSTANT } from '../Constant/ViewConstant'
 import NoteDetails from '../NoteDetails'
 import HeaderWrapper from './Header/HeaderWrapper'
-import NotesContainer from './Notes/NotesContainer'
+import NoteCard from './Notes/NoteCard'
 
 const NotesWrapper = () => {
-  const [isAddNote, setIsAddNote] = useState(false)
+  const [viewType, setViewType] = useState(null)
   const [notes, setNotes] = useState(JSON.parse(localStorage.getItem('notes')) || [])
-  const [openNoteDetail, setOpenNoteDetail] = useState(false)
   const [noteDetailsData, setNoteDetailsData] = useState({})
   const [isOpenEdit, setIsOpenEdit] = useState(false)
   const [searchedData, setSearchedData] = useState([])
@@ -31,24 +31,24 @@ const NotesWrapper = () => {
 
   //close note component
   const closeAddNote = () => {
-    setIsAddNote(false)
+    setViewType(null)
   }
 
-  //open Note details with Edit Delete Buttons
-  const noteDetailForEditDelete = (val) => {
-    setOpenNoteDetail(true)
-    setNoteDetailsData(val)
+  //open Note details
+  const noteDetailForEditDelete = (note) => {
+    setViewType(VIEW_CONSTANT.NOTE_DETAIL)
+    setNoteDetailsData(note)
   }
 
   //close NoteDetails Component
   const close = () => {
-    setOpenNoteDetail(false)
+    setViewType(null)
   }
 
   //delete Note
   const deleteNote = (id) => {
-    const deletedData = notes.filter((val) => {
-      return val.id === id ? false : true
+    const deletedData = notes.filter((note) => {
+      return note.id === id ? false : true
     })
     setNotes(deletedData)
     close()
@@ -57,21 +57,15 @@ const NotesWrapper = () => {
   //toggle Edit
   const toggleEdit = () => {
     setIsOpenEdit((p) => !p)
-
-    // if (isOpenEdit) {
-    //   setIsOpenEdit(false)
-    // } else {
-    //   setIsOpenEdit(true)
-    // }
   }
 
   //Update Note
   const UpdateNotes = (updatedNote) => {
-    const updatedData = notes.map((val) => {
-      if (val.id === updatedNote.id) {
+    const updatedData = notes.map((note) => {
+      if (note.id === updatedNote.id) {
         return updatedNote
       }
-      return val
+      return note
     })
     setNotes(updatedData)
     toggleEdit()
@@ -80,8 +74,8 @@ const NotesWrapper = () => {
 
   // Search Notes
   const searchNote = (text) => {
-    const data = notes.filter((val) => {
-      if (val.body.includes(text)) {
+    const data = notes.filter((note) => {
+      if (note.body.includes(text)) {
         return true
       }
       return false
@@ -89,55 +83,61 @@ const NotesWrapper = () => {
     setSearchedData(data)
   }
 
-  // return AddNote component
-  if (isAddNote) {
-    return (
-      <>
-        <AddNote
-          closeAddNote={closeAddNote}
-          addNote={addNote}
-        />
-        <div style={{ float: "right" }}>
-          <button onClick={() => setIsAddNote(false)}>Back</button>
-        </div>
-      </>
-    )
-  }
+  const renderView = () => {
+    switch(viewType) {
+      case VIEW_CONSTANT.ADD_NOTE:
+        return (
+          <>
+            <AddNote
+              closeAddNote={closeAddNote}
+              addNote={addNote}
+            />
+            <div style={{ float: "right" }}>
+              <button onClick={() => setViewType(null)}>Back</button>
+            </div>
+          </>
+        ) 
 
-  // return NoteDetails Component
-  if (openNoteDetail) {
-    return (
-      <NoteDetails
-        noteDetailsData={noteDetailsData}
-        close={close}
-        deleteNote={deleteNote}
-        UpdateNotes={UpdateNotes}
-        toggleEdit={toggleEdit}
-        isOpenEdit={isOpenEdit}
-      />
-    )
-  }
+      case VIEW_CONSTANT.NOTE_DETAIL:
+        return (
+          <NoteDetails
+            noteDetailsData={noteDetailsData}
+            close={close}
+            deleteNote={deleteNote}
+            UpdateNotes={UpdateNotes}
+            toggleEdit={toggleEdit}
+            isOpenEdit={isOpenEdit}
+          />
+        )
 
+      default : 
+      return (
+        <>
+          <HeaderWrapper
+            searchNote={searchNote}
+          />
+          {
+            searchedData.map((note) =>  (
+              <NoteCard
+                key={note.id}
+                openNoteDetail={noteDetailForEditDelete}
+                note={note}
+              />
+            ))
+          }
+          <div style={{ float: "right" }}>
+            <button onClick={() => setViewType(VIEW_CONSTANT.ADD_NOTE)}>Add</button>
+          </div>
+        </>
+      )
+    }
+  }
+   
   return (
     <>
-      <HeaderWrapper
-        searchNote={searchNote}
-      />
       {
-        searchedData.map((val) =>  (
-          <div
-            key={val.id}
-            onClick={() => noteDetailForEditDelete(val)}
-          >
-            <NotesContainer
-              val={val}
-            />
-          </div>
-        ))
+        renderView()
       }
-      <div style={{ float: "right" }}>
-        <button onClick={() => setIsAddNote(true)}>Add</button>
-      </div>
     </>
   )
 }

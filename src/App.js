@@ -1,10 +1,10 @@
 import './App.css';
-import NotesApp from './Components/NotesApp';
+import NotesWrapper from './Components/NotesWrapper/NotesWrapper';
 
 function App() {
   return (
     <div className="App">
-      <NotesApp/>
+      <NotesWrapper/>
     </div>
   );
 }
